@@ -6,6 +6,7 @@ import '../services/currency_service.dart';
 import '../services/notification_service.dart';
 import '../services/supabase_service.dart';
 import '../core/providers/currency_provider.dart';
+import '../core/providers/theme_provider.dart';
 
 /// Settings page with user preferences
 class SettingsPage extends ConsumerStatefulWidget {
@@ -151,7 +152,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
               children: [
                 // User profile card
                 Card(
@@ -230,37 +231,25 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         value: _notificationsEnabled,
                         onChanged: _updateNotifications,
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Data section
-                const Text(
-                  'Data',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.category_outlined),
-                        title: const Text('Categories'),
-                        subtitle: const Text('Manage expense categories'),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => context.push('/categories'),
-                      ),
                       const Divider(height: 1),
-                      ListTile(
-                        leading: const Icon(Icons.download_outlined),
-                        title: const Text('Export Data'),
-                        subtitle: const Text('Download your expenses'),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => context.push('/export'),
+                      SwitchListTile(
+                        secondary: Icon(
+                          ref.watch(themeModeProvider) == ThemeMode.dark
+                              ? Icons.dark_mode
+                              : Icons.light_mode,
+                        ),
+                        title: const Text('Dark Mode'),
+                        subtitle: Text(
+                          ref.watch(themeModeProvider) == ThemeMode.dark
+                              ? 'Dark theme enabled'
+                              : 'Light theme enabled',
+                        ),
+                        value: ref.watch(themeModeProvider) == ThemeMode.dark,
+                        onChanged: (value) {
+                          ref.read(themeModeProvider.notifier).setThemeMode(
+                                value ? ThemeMode.dark : ThemeMode.light,
+                              );
+                        },
                       ),
                     ],
                   ),

@@ -10,6 +10,7 @@ class Expense {
   final String? description;
   final DateTime expenseDate;
   final DateTime createdAt;
+  final String? receiptUrl;
 
   Expense({
     required this.id,
@@ -20,6 +21,7 @@ class Expense {
     this.description,
     required this.expenseDate,
     required this.createdAt,
+    this.receiptUrl,
   });
 
   factory Expense.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class Expense {
       description: json['description'] as String?,
       expenseDate: DateTime.parse(json['expense_date'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
+      receiptUrl: json['receipt_url'] as String?,
     );
   }
 
@@ -43,8 +46,12 @@ class Expense {
       'currency': currency,
       'description': description,
       'expense_date': expenseDate.toIso8601String().split('T')[0],
+      'receipt_url': receiptUrl,
     };
   }
+
+  /// Check if expense has a receipt attached
+  bool get hasReceipt => receiptUrl != null && receiptUrl!.isNotEmpty;
 }
 
 /// Service for managing expenses in Supabase

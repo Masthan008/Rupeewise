@@ -108,6 +108,18 @@ class _BudgetsPageState extends ConsumerState<BudgetsPage> {
       appBar: AppBar(
         title: const Text('Budgets'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.dashboard_customize),
+            tooltip: 'Templates',
+            onPressed: () async {
+              final result = await context.push('/budget-templates');
+              if (result == true) {
+                _loadBudgets();
+              }
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -144,7 +156,7 @@ class _BudgetsPageState extends ConsumerState<BudgetsPage> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
                       itemCount: _budgets.length,
                       itemBuilder: (context, index) {
                         final budget = _budgets[index];
@@ -298,14 +310,17 @@ class _BudgetsPageState extends ConsumerState<BudgetsPage> {
                       },
                     ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await context.push('/add-budget');
-          if (result == true) {
-            _loadBudgets();
-          }
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 100),
+        child: FloatingActionButton(
+          onPressed: () async {
+            final result = await context.push('/add-budget');
+            if (result == true) {
+              _loadBudgets();
+            }
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

@@ -327,19 +327,24 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                               },
                             ),
                     ),
+                    // Bottom padding for glass navigation bar
+                    const SizedBox(height: 120),
                   ],
                 ),
               ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await context.push('/add-expense');
-          if (result == true) {
-            _loadExpenses();
-          }
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Expense'),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 100),
+        child: FloatingActionButton.extended(
+          onPressed: () async {
+            final result = await context.push('/add-expense');
+            if (result == true) {
+              _loadExpenses();
+            }
+          },
+          icon: const Icon(Icons.add),
+          label: const Text('Add Expense'),
+        ),
       ),
     );
   }

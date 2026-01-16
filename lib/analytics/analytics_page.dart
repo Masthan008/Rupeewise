@@ -80,7 +80,7 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
               onRefresh: _loadAnalytics,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -161,6 +161,7 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
     }
 
     final maxY = _dailySpending.values.reduce((a, b) => a > b ? a : b);
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     return BarChart(
       BarChartData(
@@ -168,11 +169,18 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
         maxY: maxY * 1.2,
         barTouchData: BarTouchData(
           enabled: true,
+          handleBuiltInTouches: true,
           touchTooltipData: BarTouchTooltipData(
+            tooltipRoundedRadius: 12,
+            tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               return BarTooltipItem(
                 'Day ${sortedDays[groupIndex]}\n${currency.symbol}${rod.toY.toStringAsFixed(0)}',
-                const TextStyle(color: Colors.white, fontSize: 12),
+                TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               );
             },
           ),
@@ -185,13 +193,16 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
                 if (index >= 0 && index < sortedDays.length) {
-                  // Show every 5th day
                   if (sortedDays[index] % 5 == 0 || index == 0) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
                         '${sortedDays[index]}',
-                        style: const TextStyle(fontSize: 10),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     );
                   }
@@ -209,7 +220,10 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
                 if (value == 0) return const Text('');
                 return Text(
                   '${(value / 1000).toStringAsFixed(0)}k',
-                  style: const TextStyle(fontSize: 10),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey.shade500,
+                  ),
                 );
               },
             ),
@@ -222,25 +236,47 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
           show: true,
           drawVerticalLine: false,
           horizontalInterval: maxY / 4,
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: Colors.grey.shade200,
+              strokeWidth: 1,
+              dashArray: [5, 5],
+            );
+          },
         ),
         barGroups: List.generate(sortedDays.length, (index) {
           final day = sortedDays[index];
+          final value = _dailySpending[day] ?? 0;
           return BarChartGroupData(
             x: index,
             barRods: [
               BarChartRodData(
-                toY: _dailySpending[day] ?? 0,
-                color: Theme.of(context).colorScheme.primary,
-                width: sortedDays.length > 15 ? 6 : 12,
+                toY: value,
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    primaryColor,
+                    primaryColor.withAlpha(180),
+                  ],
+                ),
+                width: sortedDays.length > 15 ? 8 : 14,
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  topRight: Radius.circular(4),
+                  topLeft: Radius.circular(6),
+                  topRight: Radius.circular(6),
+                ),
+                backDrawRodData: BackgroundBarChartRodData(
+                  show: true,
+                  toY: maxY * 1.2,
+                  color: Colors.grey.shade100,
                 ),
               ),
             ],
           );
         }),
       ),
+      swapAnimationDuration: const Duration(milliseconds: 800),
+      swapAnimationCurve: Curves.easeOutQuart,
     );
   }
 
@@ -249,6 +285,8 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
     if (sortedDays.isEmpty) {
       return const Center(child: Text('No spending data'));
     }
+
+    final primaryColor = Theme.of(context).colorScheme.primary;
 
     // Calculate cumulative spending
     double cumulative = 0;
@@ -264,21 +302,60 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
       LineChartData(
         lineTouchData: LineTouchData(
           enabled: true,
+          handleBuiltInTouches: true,
+          touchSpotThreshold: 20,
           touchTooltipData: LineTouchTooltipData(
+            tooltipRoundedRadius: 12,
+            tooltipPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
+                final dayIndex = spot.spotIndex;
+                final day = dayIndex < sortedDays.length ? sortedDays[dayIndex] : 0;
                 return LineTooltipItem(
-                  '${currency.symbol}${spot.y.toStringAsFixed(0)}',
-                  const TextStyle(color: Colors.white, fontSize: 12),
+                  'Day $day\n${currency.symbol}${spot.y.toStringAsFixed(0)}',
+                  TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 );
               }).toList();
             },
           ),
+          getTouchedSpotIndicator: (barData, spotIndexes) {
+            return spotIndexes.map((index) {
+              return TouchedSpotIndicatorData(
+                FlLine(
+                  color: primaryColor.withAlpha(100),
+                  strokeWidth: 2,
+                  dashArray: [5, 5],
+                ),
+                FlDotData(
+                  show: true,
+                  getDotPainter: (spot, percent, bar, index) {
+                    return FlDotCirclePainter(
+                      radius: 6,
+                      color: Colors.white,
+                      strokeWidth: 3,
+                      strokeColor: primaryColor,
+                    );
+                  },
+                ),
+              );
+            }).toList();
+          },
         ),
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
           horizontalInterval: maxY / 4,
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: Colors.grey.shade200,
+              strokeWidth: 1,
+              dashArray: [5, 5],
+            );
+          },
         ),
         titlesData: FlTitlesData(
           show: true,
@@ -294,7 +371,11 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
                         '${sortedDays[index]}',
-                        style: const TextStyle(fontSize: 10),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     );
                   }
@@ -311,7 +392,10 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
                 if (value == 0) return const Text('');
                 return Text(
                   '${(value / 1000).toStringAsFixed(0)}k',
-                  style: const TextStyle(fontSize: 10),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey.shade500,
+                  ),
                 );
               },
             ),
@@ -328,17 +412,52 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
           LineChartBarData(
             spots: cumulativeData,
             isCurved: true,
-            color: Theme.of(context).colorScheme.primary,
-            barWidth: 3,
+            curveSmoothness: 0.3,
+            preventCurveOverShooting: true,
+            gradient: LinearGradient(
+              colors: [
+                primaryColor,
+                primaryColor.withAlpha(180),
+              ],
+            ),
+            barWidth: 4,
             isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, bar, index) {
+                // Show dots at specific intervals
+                if (index % 5 == 0 || index == cumulativeData.length - 1) {
+                  return FlDotCirclePainter(
+                    radius: 4,
+                    color: Colors.white,
+                    strokeWidth: 2,
+                    strokeColor: primaryColor,
+                  );
+                }
+                return FlDotCirclePainter(
+                  radius: 0,
+                  color: Colors.transparent,
+                  strokeWidth: 0,
+                  strokeColor: Colors.transparent,
+                );
+              },
+            ),
             belowBarData: BarAreaData(
               show: true,
-              color: Theme.of(context).colorScheme.primary.withAlpha(51),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  primaryColor.withAlpha(100),
+                  primaryColor.withAlpha(20),
+                ],
+              ),
             ),
           ),
         ],
       ),
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutCubic,
     );
   }
 

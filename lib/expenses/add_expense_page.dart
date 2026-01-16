@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../services/expense_service.dart';
 import '../services/category_service.dart';
+import '../services/expense_reminder_service.dart';
 import '../core/utils/category_icons.dart';
 import '../core/providers/currency_provider.dart';
 
@@ -92,6 +93,9 @@ class _AddExpensePageState extends ConsumerState<AddExpensePage> {
         categoryId: _selectedCategoryId,
         expenseDate: _selectedDate,
       );
+
+      // Track expense for reminder service
+      await ExpenseReminderService().onExpenseAdded();
 
       if (mounted) {
         context.pop(true);

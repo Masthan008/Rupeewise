@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../widgets/glass_bottom_nav_bar.dart';
 
-/// Main shell with bottom navigation
+/// Main shell with liquid glass bottom navigation (5 tabs)
 class MainShell extends StatefulWidget {
   final Widget child;
   
@@ -17,7 +18,8 @@ class _MainShellState extends State<MainShell> {
     if (location.startsWith('/dashboard')) return 0;
     if (location.startsWith('/analytics')) return 1;
     if (location.startsWith('/budgets')) return 2;
-    if (location.startsWith('/settings')) return 3;
+    if (location.startsWith('/menu')) return 3;
+    if (location.startsWith('/settings')) return 4;
     return 0;
   }
 
@@ -33,6 +35,9 @@ class _MainShellState extends State<MainShell> {
         context.go('/budgets');
         break;
       case 3:
+        context.go('/menu');
+        break;
+      case 4:
         context.go('/settings');
         break;
     }
@@ -40,30 +45,38 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedIndex = _calculateSelectedIndex(context);
+    
     return Scaffold(
+      extendBody: true,
       body: widget.child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _calculateSelectedIndex(context),
-        onDestinationSelected: (index) => _onItemTapped(index, context),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+      bottomNavigationBar: GlassBottomNavBar(
+        currentIndex: selectedIndex,
+        onTap: (index) => _onItemTapped(index, context),
+        items: const [
+          GlassNavItem(
+            icon: Icons.home_outlined,
+            activeIcon: Icons.home,
             label: 'Home',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
+          GlassNavItem(
+            icon: Icons.bar_chart_outlined,
+            activeIcon: Icons.bar_chart,
             label: 'Analytics',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: Icon(Icons.account_balance_wallet),
+          GlassNavItem(
+            icon: Icons.account_balance_wallet_outlined,
+            activeIcon: Icons.account_balance_wallet,
             label: 'Budgets',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
+          GlassNavItem(
+            icon: Icons.grid_view_outlined,
+            activeIcon: Icons.grid_view,
+            label: 'More',
+          ),
+          GlassNavItem(
+            icon: Icons.settings_outlined,
+            activeIcon: Icons.settings,
             label: 'Settings',
           ),
         ],

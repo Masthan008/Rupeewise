@@ -10,6 +10,12 @@ import '../settings/settings_page.dart';
 import '../categories/categories_page.dart';
 import '../export/export_page.dart';
 import '../expenses/add_expense_page.dart';
+import '../savings/savings_goals_page.dart';
+import '../recurring/recurring_expenses_page.dart';
+import '../settings/spending_limits_page.dart';
+import '../income/income_page.dart';
+import '../budgets/budget_templates_page.dart';
+import '../menu/menu_page.dart';
 import '../shell/main_shell.dart';
 import '../services/supabase_service.dart';
 
@@ -79,6 +85,13 @@ class AppRouter {
             ),
           ),
           GoRoute(
+            path: '/menu',
+            name: 'menu',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: MenuPage(),
+            ),
+          ),
+          GoRoute(
             path: '/settings',
             name: 'settings',
             pageBuilder: (context, state) => const NoTransitionPage(
@@ -112,6 +125,36 @@ class AppRouter {
         name: 'export',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ExportPage(),
+      ),
+      GoRoute(
+        path: '/savings-goals',
+        name: 'savings-goals',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SavingsGoalsPage(),
+      ),
+      GoRoute(
+        path: '/recurring-expenses',
+        name: 'recurring-expenses',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const RecurringExpensesPage(),
+      ),
+      GoRoute(
+        path: '/spending-limits',
+        name: 'spending-limits',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SpendingLimitsPage(),
+      ),
+      GoRoute(
+        path: '/income',
+        name: 'income',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const IncomePage(),
+      ),
+      GoRoute(
+        path: '/budget-templates',
+        name: 'budget-templates',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const BudgetTemplatesPage(),
       ),
     ],
   );
