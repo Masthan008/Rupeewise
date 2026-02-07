@@ -16,6 +16,7 @@ import '../settings/spending_limits_page.dart';
 import '../income/income_page.dart';
 import '../budgets/budget_templates_page.dart';
 import '../menu/menu_page.dart';
+import '../splash/splash_screen.dart';
 import '../shell/main_shell.dart';
 import '../services/supabase_service.dart';
 
@@ -27,11 +28,15 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>()
 class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/login',
+    initialLocation: '/',
     redirect: (context, state) {
       final isLoggedIn = SupabaseService.instance.isAuthenticated;
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
+      final isSplash = state.matchedLocation == '/';
+
+      // Skip redirect on splash screen
+      if (isSplash) return null;
 
       // If not logged in and not on auth page, redirect to login
       if (!isLoggedIn && !isAuthRoute) {
@@ -46,6 +51,13 @@ class AppRouter {
       return null;
     },
     routes: [
+      // Splash screen
+      GoRoute(
+        path: '/',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      
       // Auth routes (no shell)
       GoRoute(
         path: '/login',

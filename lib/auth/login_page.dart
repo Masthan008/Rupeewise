@@ -59,17 +59,26 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.primary.withAlpha(30),
-              Theme.of(context).colorScheme.secondary.withAlpha(20),
-              Colors.white,
-            ],
+            colors: isDark
+                ? [
+                    Colors.grey.shade900,
+                    Colors.grey.shade800,
+                    Colors.black,
+                  ]
+                : [
+                    Theme.of(context).colorScheme.primary.withAlpha(40),
+                    Theme.of(context).colorScheme.secondary.withAlpha(30),
+                    scaffoldBg,
+                  ],
           ),
         ),
         child: SafeArea(
@@ -127,15 +136,19 @@ class _LoginPageState extends State<LoginPage> {
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(180),
+                        color: isDark 
+                            ? Colors.grey.shade800.withAlpha(200)
+                            : Colors.white.withAlpha(230),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Colors.white.withAlpha(100),
+                          color: isDark
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade200,
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withAlpha(10),
+                            color: Colors.black.withAlpha(isDark ? 30 : 10),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -192,6 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                               controller: _emailController,
                               label: 'Email',
                               icon: Icons.email_outlined,
+                              isDark: isDark,
                               keyboardType: TextInputType.emailAddress,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
@@ -209,6 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                               controller: _passwordController,
                               label: 'Password',
                               icon: Icons.lock_outlined,
+                              isDark: isDark,
                               obscureText: _obscurePassword,
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -274,6 +289,7 @@ class _LoginPageState extends State<LoginPage> {
     required TextEditingController controller,
     required String label,
     required IconData icon,
+    required bool isDark,
     TextInputType? keyboardType,
     bool obscureText = false,
     Widget? suffixIcon,
@@ -284,19 +300,32 @@ class _LoginPageState extends State<LoginPage> {
       keyboardType: keyboardType,
       obscureText: obscureText,
       validator: validator,
+      style: TextStyle(
+        color: isDark ? Colors.white : Colors.black87,
+      ),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: Colors.grey.shade600),
+        labelStyle: TextStyle(
+          color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+        ),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.grey.shade100.withAlpha(150),
+        fillColor: isDark
+            ? Colors.grey.shade700.withAlpha(150)
+            : Colors.grey.shade100.withAlpha(200),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(
+            color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

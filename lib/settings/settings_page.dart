@@ -20,6 +20,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   final NotificationService _notificationService = NotificationService();
 
   bool _notificationsEnabled = true;
+  bool _rateAlertsEnabled = false;
   bool _isLoading = true;
   String _userName = '';
   String _userEmail = '';
@@ -249,6 +250,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           ref.read(themeModeProvider.notifier).setThemeMode(
                                 value ? ThemeMode.dark : ThemeMode.light,
                               );
+                        },
+                      ),
+                      const Divider(height: 1),
+                      SwitchListTile(
+                        secondary: const Icon(Icons.currency_exchange),
+                        title: const Text('Rate Alerts'),
+                        subtitle: const Text('Daily exchange rate updates'),
+                        value: _rateAlertsEnabled,
+                        onChanged: (value) {
+                          setState(() => _rateAlertsEnabled = value);
+                          // TODO: Implement notification scheduling
                         },
                       ),
                     ],

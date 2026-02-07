@@ -7,6 +7,7 @@ import '../services/category_service.dart';
 import '../services/supabase_service.dart';
 import '../core/utils/category_icons.dart';
 import '../core/providers/currency_provider.dart';
+import '../widgets/exchange_rate_card.dart';
 
 /// Dashboard page showing expense summary
 class DashboardPage extends ConsumerStatefulWidget {
@@ -163,108 +164,172 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
                 onRefresh: _loadData,
-                child: Column(
-                  children: [
-                    // Monthly summary card
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Hello, $_userName!',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'This Month',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer
-                                  .withAlpha(179),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            currency.formatAmount(_monthTotal),
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Recent expenses header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Recent Expenses',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (_expenses.isNotEmpty)
-                            TextButton(
-                              onPressed: () => context.push('/analytics'),
-                              child: const Text('View All'),
-                            ),
-                        ],
-                      ),
-                    ),
-                    // Expenses list
-                    Expanded(
-                      child: _expenses.isEmpty
-                          ? Center(
+                child: _expenses.isEmpty
+                    // Empty state - scrollable single child
+                    ? SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 100),
+                        child: Column(
+                          children: [
+                            // Monthly summary card
+                            Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(
-                                    Icons.receipt_long_outlined,
-                                    size: 80,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                  const SizedBox(height: 16),
                                   Text(
-                                    'No expenses yet',
+                                    'Hello, $_userName!',
                                     style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey.shade600,
+                                      fontSize: 18,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                     ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Add your first expense to get started',
+                                    'This Month',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Colors.grey.shade500,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer
+                                          .withAlpha(179),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    currency.formatAmount(_monthTotal),
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
                                     ),
                                   ),
                                 ],
                               ),
-                            )
-                          : ListView.builder(
+                            ),
+                            
+                            // Exchange rate insight card
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: ExchangeRateCard(),
+                            ),
+                            
+                            // Empty state
+                            const SizedBox(height: 48),
+                            Icon(
+                              Icons.receipt_long_outlined,
+                              size: 80,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No expenses yet',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Add your first expense to get started',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    // Has expenses - Column with Expanded list
+                    : Column(
+                        children: [
+                          // Monthly summary card
+                          Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Hello, $_userName!',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'This Month',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer
+                                        .withAlpha(179),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  currency.formatAmount(_monthTotal),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                          // Exchange rate insight card
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: ExchangeRateCard(),
+                          ),
+                          
+                          // Recent expenses header
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Recent Expenses',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => context.push('/analytics'),
+                                  child: const Text('View All'),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Expenses list
+                          Expanded(
+                            child: ListView.builder(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16),
                               itemCount: _expenses.length > 10
@@ -326,11 +391,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                                 );
                               },
                             ),
-                    ),
-                    // Bottom padding for glass navigation bar
-                    const SizedBox(height: 120),
-                  ],
-                ),
+                          ),
+                          // Bottom padding for glass navigation bar
+                          const SizedBox(height: 120),
+                        ],
+                      ),
               ),
       ),
       floatingActionButton: Padding(

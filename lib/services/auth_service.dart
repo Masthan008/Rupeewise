@@ -24,6 +24,23 @@ class AuthService {
       password: password,
       data: {'full_name': fullName},
     );
+    
+    // Create user profile in database
+    if (response.user != null) {
+      try {
+        await _client.from('users_profile').upsert({
+          'id': response.user!.id,
+          'email': email,
+          'full_name': fullName,
+          'preferred_currency': 'INR',
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      } catch (e) {
+        // Profile creation failed, but auth succeeded
+        // Continue anyway - profile can be created later
+      }
+    }
+    
     return response;
   }
 
